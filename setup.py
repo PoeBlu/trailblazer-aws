@@ -19,8 +19,9 @@ from setuptools import setup, find_packages
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 with open('trailblazer/__about__.py', 'rb') as f:
-    TRAILBLAZER_VERSION = str(ast.literal_eval(_version_re.search(
-        f.read().decode('utf-8')).group(1)))
+    TRAILBLAZER_VERSION = str(
+        ast.literal_eval(_version_re.search(f.read().decode('utf-8'))[1])
+    )
 
 ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 

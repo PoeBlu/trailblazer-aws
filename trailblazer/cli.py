@@ -127,10 +127,10 @@ def process(ctx, directory, arn):
     if not os.path.exists(directory):
         log.fatal('Invalid Directory Path')
 
-    files = []
-    for cloudtrail_file in os.listdir(directory):
-        files.append(os.path.join(directory, cloudtrail_file))
-
+    files = [
+        os.path.join(directory, cloudtrail_file)
+        for cloudtrail_file in os.listdir(directory)
+    ]
     api_calls_logged = process_cloudtrail(arn, files)
 
 
@@ -146,10 +146,10 @@ def record(ctx, directory, arn, output):
     if not os.path.exists(directory):
         log.fatal('Invalid Directory Path')
 
-    files = []
-    for cloudtrail_file in os.listdir(directory):
-        files.append(os.path.join(directory, cloudtrail_file))
-
+    files = [
+        os.path.join(directory, cloudtrail_file)
+        for cloudtrail_file in os.listdir(directory)
+    ]
     api_calls_recorded = record_cloudtrail(arn, files)
 
     if output:

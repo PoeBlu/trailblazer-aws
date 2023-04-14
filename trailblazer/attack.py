@@ -40,11 +40,7 @@ def make_call(config, session, service, command, region=None):
             params = re.findall('\{(.*?)\}', service_call_params.get(function_key, '/'))
             params = [p.strip('+') for p in params]
 
-            func_params = {}
-
-            for param in params:
-                func_params[param] = 'testparameter'
-
+            func_params = {param: 'testparameter' for param in params}
             try:
                 make_api_call(service, function, region, func_params)
             except ClientError as e:
@@ -54,7 +50,7 @@ def make_call(config, session, service, command, region=None):
             except TypeError as e:
                 log.debug(e)
             except KeyError as e:
-                log.debug('Unknown Exception: {}.{} - {}'.format(service, function[0], e))
+                log.debug(f'Unknown Exception: {service}.{function[0]} - {e}')
 
             return
 
@@ -74,10 +70,10 @@ def simulate_attack(config, commands, dry_run=False):
         delay = command.get('time_delay', 0)
         region = command.get('region', None)
 
-        log.info('Making call - {}.{}'.format(service, api_call))
+        log.info(f'Making call - {service}.{api_call}')
         if not dry_run:
             make_call(config, session, service, api_call, region)
-        log.info('Sleeping {} until next call'.format(delay))
+        log.info(f'Sleeping {delay} until next call')
         if not dry_run:
             time.sleep(delay)
 

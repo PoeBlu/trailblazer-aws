@@ -5,7 +5,7 @@ from trailblazer import log
 
 
 def get_assume_role_session(account_number, role, session_id):
-    arn = "arn:aws:iam::{}:role/{}".format(account_number, role)
+    arn = f"arn:aws:iam::{account_number}:role/{role}"
 
     try:
     	session = boto3.Session()

@@ -20,11 +20,11 @@ def enumerate_services(config, services, dry_run=False):
     for service in services:
 
         if len(session.get_available_regions(service)) == 0:
-            log.debug('Skipping {} - No regions exist for this service'.format(service))
+            log.debug(f'Skipping {service} - No regions exist for this service')
             continue
 
         # Create a service client
-        log.info('Creating {} client...'.format(service))
+        log.info(f'Creating {service} client...')
 
         # Grab a region to use for the calls.  This should be us-west-2
         region = session.get_available_regions(service)[-1]
@@ -54,7 +54,7 @@ def enumerate_services(config, services, dry_run=False):
             # Session Name Can only be 64 characters long
             if len(function_key) > 64:
                 session_name = function_key[:63]
-                log.info('Session Name {} is for {}'.format(session_name, function_key))
+                log.info(f'Session Name {session_name} is for {function_key}')
             else:
                 session_name = function_key
 
@@ -76,13 +76,10 @@ def enumerate_services(config, services, dry_run=False):
                     params = [p.strip('+') for p in params]
 
                     try:
-                        func_params = {}
-
-                        for param in params:
-                            # Set something because we have to
-                            func_params[param] = 'testparameter'
-
-                        log.info('Calling {}.{} with params {} in {}'.format(service, new_func[0], func_params, region))
+                        func_params = {param: 'testparameter' for param in params}
+                        log.info(
+                            f'Calling {service}.{new_func[0]} with params {func_params} in {region}'
+                        )
 
                         if not dry_run:
                         	make_api_call(service, new_func, region, func_params)
@@ -94,4 +91,4 @@ def enumerate_services(config, services, dry_run=False):
                     except TypeError as e:
                         log.debug(e)
                     except KeyError as e:
-                        log.debug('Unknown Exception: {}.{} - {}'.format(service, new_func[0], e))
+                        log.debug(f'Unknown Exception: {service}.{new_func[0]} - {e}')

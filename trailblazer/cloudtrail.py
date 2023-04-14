@@ -13,17 +13,13 @@ def process_cloudtrail(arn, files):
 
     for file in files:
         f = None
-        log.debug('Processing file: {}'.format(file))
+        log.debug(f'Processing file: {file}')
 
-        if file.endswith('.gz'):
-            f = gzip.open(file, 'r')
-        else:
-            f = open(file, 'r')
-
+        f = gzip.open(file, 'r') if file.endswith('.gz') else open(file, 'r')
         try:
             cloudtrail = json.load(f)
         except Exception as e:
-            log.error('Invalid JSON File: {} - {}'.format(file, e))
+            log.error(f'Invalid JSON File: {file} - {e}')
             continue
 
         for record in cloudtrail['Records']:
@@ -31,12 +27,14 @@ def process_cloudtrail(arn, files):
                 event_source = record['eventSource'].split('.')[0]
                 event_name = record['eventName']
 
-                call = '{}.{}'.format(event_source, event_name)
+                call = f'{event_source}.{event_name}'
 
                 if call not in api_calls:
                     session = record['userIdentity']['arn'].split('/')[-1]
                     match = (record['eventName'].lower() == session)
-                    log.info('{}, {}, {}, {}'.format(record['eventSource'].split('.')[0], record['eventName'], session, match))
+                    log.info(
+                        f"{record['eventSource'].split('.')[0]}, {record['eventName']}, {session}, {match}"
+                    )
                     api_calls.append(call)
 
         f.close()
@@ -61,17 +59,13 @@ def record_cloudtrail(arn, files):
 
     for file in files:
         f = None
-        log.info('Processing file: {}'.format(file))
+        log.info(f'Processing file: {file}')
 
-        if file.endswith('.gz'):
-            f = gzip.open(file, 'r')
-        else:
-            f = open(file, 'r')
-
+        f = gzip.open(file, 'r') if file.endswith('.gz') else open(file, 'r')
         try:
             cloudtrail = json.load(f)
         except Exception as e:
-            log.error('Invalid JSON File: {} - {}'.format(file, e))
+            log.error(f'Invalid JSON File: {file} - {e}')
             continue
 
         records = sorted(cloudtrail['Records'], key=lambda x: datetime.strptime(x['eventTime'], '%Y-%m-%dT%H:%M:%SZ'), reverse=False)
@@ -86,14 +80,16 @@ def record_cloudtrail(arn, files):
                     time_delta = datetime.strptime(next_record['eventTime'], '%Y-%m-%dT%H:%M:%SZ') - datetime.strptime(record['eventTime'], '%Y-%m-%dT%H:%M:%SZ')
                     time_delay = time_delta.seconds
 
-                call = '{}.{}'.format(event_source, event_name)
+                call = f'{event_source}.{event_name}'
 
-                log.info('{}.{} - {}'.format(record['eventSource'].split('.')[0], record['eventName'], record['userIdentity']['arn']))
+                log.info(
+                    f"{record['eventSource'].split('.')[0]}.{record['eventName']} - {record['userIdentity']['arn']}"
+                )
 
                 api_calls.append(
                     {
-                        'call': '{}.{}'.format(event_source, event_name),
-                        'time_delay': time_delay
+                        'call': f'{event_source}.{event_name}',
+                        'time_delay': time_delay,
                     }
                 )
 
